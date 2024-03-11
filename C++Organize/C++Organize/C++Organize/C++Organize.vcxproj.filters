@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="TextRPG\stdafx.cpp" />
+    <ClCompile Include="TextRPG\GameStart.cpp" />
+    <ClCompile Include="TextRPG\main.cpp" />
+    <ClCompile Include="TextRPG\Character.cpp" />
+    <ClCompile Include="TextRPG\Warrior.cpp" />
+    <ClCompile Include="TextRPG\Magician.cpp" />
+    <ClCompile Include="TextRPG\Archer.cpp" />
+    <ClCompile Include="TextRPG\Thief.cpp" />
+    <ClCompile Include="TextRPG\Monster.cpp" />
+    <ClCompile Include="TextRPG\Weapon.cpp" />
+    <ClCompile Include="TextRPG\InGame.cpp" />
+    <ClCompile Include="TextRPG\Ending.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TextRPG\stdafx.h" />
+    <ClInclude Include="TextRPG\GameStart.h" />
+    <ClInclude Include="TextRPG\Character.h" />
+    <ClInclude Include="TextRPG\Warrior.h" />
+    <ClInclude Include="TextRPG\Magician.h" />
+    <ClInclude Include="TextRPG\Archer.h" />
+    <ClInclude Include="TextRPG\Thief.h" />
+    <ClInclude Include="TextRPG\Monster.h" />
+    <ClInclude Include="TextRPG\Weapon.h" />
+    <ClInclude Include="TextRPG\InGame.h" />
+    <ClInclude Include="TextRPG\Ending.h" />
+  </ItemGroup>
+</Project>
