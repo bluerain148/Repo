@@ -11,18 +11,26 @@ public:
 
 	void SelectCharacter();
 	void Update();
-	void Status();
+	void Status(Character* charac);
 	void MoveDungeon();
 	void InDungeon();
 	void GetPotion();
-	void Battle(Character* player, Monster* monster);
-	void BossBattle(Character* player, Monster* monster);
 
+public:
+
+	void Battle(Character* player, Monster* monster);
+	void LostHpRender(Character* player, Monster* monster, int range, bool isUserturn);
+	void BossBattle(Character* player, Monster* monster);
+	void Dice();
 
 public:
 	Character* player;
 	Monster* monsters;
 
-	bool userTurn = true; //user턴이면 true;
+	//bool userTurn = true; //user턴이면 true;
 	int bossCount = 0;
+	bool isBattle = false;
+	int randMoney = 0;
+
 };
+

@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 InGameScene::InGameScene()
 {
 	SelectCharacter();
@@ -22,6 +21,7 @@ void InGameScene::SelectCharacter()
 
 	int selectCharacter;
 	cin >> selectCharacter;
+
 
 	switch (selectCharacter)
 	{
@@ -51,7 +51,7 @@ void InGameScene::SelectCharacter()
 		system("cls");
 		cout << "궁수를 선택하셨습니다." << endl;
 		Sleep(500);
-		cout << "내 화살을 네 미간에 꽂아주지!" << endl;
+		cout << "내 화살을 미간에 꽂아주지" << endl;
 
 		player = new Archer();
 		Sleep(1700);
@@ -71,7 +71,6 @@ void InGameScene::SelectCharacter()
 	}
 
 	Update();
-
 }
 
 void InGameScene::Update()
@@ -98,50 +97,29 @@ void InGameScene::Update()
 
 		case 2:
 			system("cls");
-			Status();
 			break;
 
 		case 3:
 			system("cls");
 			cout << "정말로 끝내시겠습니까?(y/n)" << endl;
 			cin >> quit;
-			//if (quit == 'y') Quit();
-			//else
-			//{
-			//	system("cls");
-			//	Update();
-			//}
 			break;
 		}
-
 	}
 }
 
-void InGameScene::Status()
+void InGameScene::Status(Character* charac)
 {
-	cout << "스테이터스 확인" << endl;
-	cout << endl;
-	cout << "HP:	" << player->stat.Hp << "/" << player->stat.MaxHp << endl;
-	cout << "MP:	" << player->stat.Mp << "/" << player->stat.MaxMp << endl;
-	cout << "Att:	" << player->stat.Att << endl;
-	cout << "Def:	" << player->stat.Def << endl;
-	cout << "Gold:	" << player->stat.Gold << endl;
+	cout << "직업:	" << charac->stat.name << endl;
+	cout << "Lv:	" << charac->stat.Level<<endl;
+	cout << "ExP:	" << charac->stat.Exp << "/" << charac->stat.MaxExp << endl;
+	cout << "HP:	" << charac->stat.Hp << "/" << charac->stat.MaxHp << endl;
+	cout << "MP:	" << charac->stat.Mp << "/" << charac->stat.MaxMp << endl;
+	cout << "Att:	" << charac->stat.Att << endl;
+	cout << "Def:	" << charac->stat.Def << endl;
+	cout << "Gold:	" << charac->stat.Gold << endl;
 
 	cout << endl;
-	cout << "1.메인으로 돌아가기" << endl;
-
-	int userinput;
-	cin >> userinput;
-	if (userinput == 1)
-	{
-		system("cls");
-		Update();
-	}
-	else
-	{
-		system("cls");
-		Status();
-	}
 }
 
 void InGameScene::MoveDungeon()
@@ -161,21 +139,19 @@ void InGameScene::MoveDungeon()
 
 void InGameScene::InDungeon()
 {
+
 	int userInput;
 	int randNum = 0;
-	int randHp;
-	int randMoney = 0;
 	cout << "1.던전 안으로 더 들어가본다." << endl;
 	cout << "2.스테이터스 확인" << endl;
 	cout << "3.메인으로 돌아가기" << endl;
 
 
-	if (bossCount >= 10)
+	if (bossCount >= 15)
 	{
 		system("cls");
 		cout << "고블린 킹을 발견했습니다." << endl;
 	}
-
 	cin >> userInput;
 
 	switch (userInput)
@@ -196,22 +172,27 @@ void InGameScene::InDungeon()
 		else if (randNum == 6 || randNum == 12)
 		{
 			GetPotion();
-
 			bossCount++;
 		}
-		else if (randNum == 4 || randNum == 8)
+		else if (randNum == 4)
+		{
+			cout << "아무 일도 일어나지 않았다." << endl;
+			bossCount++;
+		}
+		else
 		{
 			cout << "몬스터 발견!" << endl;
 			Sleep(1000);
 			bossCount++;
+			if (player->GetCharacterType() == eMagician)
+				player->coolTime = 1;
+			else
+				player->coolTime = 3;
+
 
 			monsters = new Monster;
+
 			Battle(player, monsters);
-		}
-		else
-		{
-			cout << "아무 일도 일어나지 않았다." << endl;
-			bossCount++;
 		}
 		Sleep(1500);
 		system("cls");
@@ -219,7 +200,6 @@ void InGameScene::InDungeon()
 		break;
 	case 2:
 		system("cls");
-		Status();
 		break;
 	case 3:
 		system("cls");
@@ -252,62 +232,178 @@ void InGameScene::GetPotion()
 		{
 			player->stat.Hp = player->stat.MaxHp;
 			cout << "회복포션을 마셨지만 이미 체력이 가득찼다." << endl;
-
 		}
 		break;
 	case 2:
-		//인벤토리 만들어서 넣기.
 		break;
 	case 3:
 		break;
 	}
 }
 
+
 void InGameScene::Battle(Character* player, Monster* monster)
 {
 	system("cls");
+	Status(player);
+	cout << endl;
+	Status(monster);
 
+	//선턴 주사위
+	Dice();
+
+	//승리 or 패배 판정
 	if (player->stat.Hp <= 0)
 	{
 		cout << "You Died" << endl;
+		isBattle = false;
+		Sleep(1000);
+		player->skillDuration = 0;
+		return;
 	}
 	else if (monster->stat.Hp <= 0)
 	{
 		cout << "전투에서 승리했습니다." << endl;
-		cout << "경험치를 획득했습니다" << endl; //Todo: 몬스터마다 경험치가 다름.
+		cout << monster->stat.Exp << "만큼 경험치를 획득했습니다" << endl;
+		player->ExpUp(monster);
+		isBattle = false;
+		Sleep(1000);
+		player->skillDuration = 0;
+		return;
 	}
 
 	int userInput;
-	
+
 	int playerDamage = player->stat.Att - monster->stat.Def + rand() % 10 + 1;
 	int monsterDamage = monster->stat.Att - player->stat.Def + rand() % 5 + 0;
-
-	if (userTurn)
+	
+	if (player->GetUserTurn())
 	{
+		if (player->coolTime <= 0)player->coolTime = 0;
+
 		cout << "유저의 턴입니다." << endl;
 		cout << "1.공격" << endl;
-		cout << "2.스킬 사용" << endl;
-		cout << "3.스테이터스 확인" << endl;
+		cout << "2.스킬 사용" << " (남은 쿨타임: "<<player->coolTime <<")" << endl;
+		cout << "3.인벤토리 확인" << endl;
 		cout << "4.도망치기" << endl;
 
 		cin >> userInput;
-		
-		userTurn = false;
+
+		player->SetUserTurn(false);
+
+
 		switch (userInput)
 		{
 		case 1:
-			monster->stat.Hp = playerDamage;
+		{
+			player->Attack(player, monster); //플레이어 공격
+
+			if (player->skillDuration <= 0) player->coolTime--;
 			break;
 		}
-
+			break;
+		case 2:
+		{
+			if (player->coolTime > 0)
+			{
+				cout << "쿨타임이 " << player->coolTime << " 만큼 남았습니다." << endl;
+				Sleep(1000);
+				if (player->skillDuration <= 0) player->coolTime--;
+				break;
+			}
+			player->Skill(player, monster); //플레이어 스킬
+		}
+			break;
+		case 3:
+			break;
+		case 4:
+		{
+			LostHpRender(player, monster, monsterDamage, false);
+			cout << monster->stat.name << "에게서 " << monsterDamage << "만큼 데미지를 입었습니다." << endl;
+			Sleep(1000);
+			cout <<monster->stat.name<< "에게서 도망쳐 나왔습니다." << endl;
+			Sleep(1000);
+			return;
+		}
+		}
 		Battle(player, monster);
 	}
 	else
 	{
-		cout << monster->name << "의 턴입니다." << endl;
+		cout <<monster->stat.name << "의 턴입니다." << endl;
+		monster->Attack(player, monster);
+		player->SetUserTurn(true);
+		
+		//Warrior 스킬 효과
+		if (player->GetCharacterType() == eWarrior && player->skillDuration > 0)
+		{
+			cout << "전사의 스킬 효과로 인해 " << player->stat.Def * 3 << "만큼 데미지를 입었습니다." << endl;
+			monster->stat.Hp -= player->stat.Def * 3;
+			Sleep(1500);
+			
+			player->skillDuration--;
+			cout << "스킬 지속시간이 " << player->skillDuration << "턴 만큼 남았습니다." << endl;
+			
+			Sleep(1000);
+		}
+		Battle(player, monster);
 	}
+}
+
+void InGameScene::LostHpRender(Character* player, Monster* monster, int range, bool isUserturn)
+{
+	//몬스터 턴일때는 player의 hp렌더링 유저턴일때는 몬스터의 hp렌더링
+	
+	if (!isUserturn)
+	{
+		for (int i = 0; i < range; i++)
+		{
+			player->stat.Hp--;
+			Status(player);
+			Status(monster);
+			Sleep(10);
+			system("cls");
+
+		}
+	}
+	else
+	{
+		for (int i = 0; i < range; i++)
+		{
+			monster->stat.Hp--;
+			Status(player);
+			Status(monster);
+			Sleep(10);
+			system("cls");
+		}
+	}
+	Status(player);
+	Status(monster);
+	Sleep(700);
+
 }
 
 void InGameScene::BossBattle(Character* player, Monster* monster)
 {
 }
+
+void InGameScene::Dice()
+{
+	if (!isBattle)
+	{
+		int turnDice = rand() % 2;
+		player->SetUserTurn(turnDice);
+		isBattle = true;
+		if (player->GetUserTurn())
+		{
+			cout << "주사위에서 승리했습니다!" << endl;
+			Sleep(1000);
+		}
+		else
+		{
+			cout << "아쉽게도 주사위에서 패배했습니다." << endl;
+			Sleep(1000);
+		}
+	}
+}
+

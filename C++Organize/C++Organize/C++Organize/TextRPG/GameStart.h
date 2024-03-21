@@ -16,11 +16,9 @@ public:
 
 public:
 	void Init();
-
+	void Print();
 	void Quit();
-
 
 	Character* player;
 	Monster* monsters;
-
 };
